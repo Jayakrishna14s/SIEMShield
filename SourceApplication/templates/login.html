@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEMSHIELD</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='images/favicon.ico') }}"
+    />
+  </head>
+  <body class="bg-gray-100 flex flex-col h-screen">
+    <nav class="bg-white shadow-md p-4 px-6 shadow-lg flex justify-between">
+      <a
+        onclick="window.location.reload()"
+        class="text-2xl text-blue-500 tracking-wide font-bold cursor-pointer"
+        >SIEM<span class="text-gray-700">SHIELD</span>
+      </a>
+      <button onclick="window.location.href = '/signup'">REGISTER</button>
+    </nav>
+
+    <main
+      class="flex-1 overflow-scroll flex justify-around items-center flex-col"
+    >
+      <div
+        class="flex flex-col justify-center h-[80%] w-[40%] px-6 py-12 lg:px-8 bg-white rounded-lg shadow-lg"
+      >
+        <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+          <img
+            class="mx-auto h-20 w-auto"
+            src="{{ url_for('static', filename='images/siem.png') }}"
+            alt="Your Company"
+          />
+          <h2
+            class="mt-10 text-center text-2xl/9 font-semibold tracking-tight text-gray-900"
+          >
+            Signin to your account
+          </h2>
+        </div>
+
+        <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          <form class="space-y-6">
+            <div>
+              <label
+                for="username"
+                class="block text-sm/6 font-medium text-gray-900"
+                >Username</label
+              >
+              <div class="mt-2">
+                <input
+                  type="text"
+                  name="username"
+                  id="text"
+                  placeholder="Enter your username"
+                  required
+                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between">
+                <label
+                  for="password"
+                  class="block text-sm/6 font-medium text-gray-900"
+                  >Password</label
+                >
+                <div class="text-sm">
+                  <!--<a
+                    href="#"
+                    class="font-semibold text-indigo-600 hover:text-indigo-500"
+                    >Forgot password?</a
+                >-->
+                </div>
+              </div>
+              <div class="mt-2">
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  placeholder="Enter your password"
+                  required
+                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                />
+              </div>
+            </div>
+
+            <div class="verdict text-red-500 mb-3 text-center w-full"></div>
+
+            <div>
+              <button
+                onclick="login()"
+                class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Sign in
+              </button>
+            </div>
+          </form>
+
+          <p class="mt-10 text-center text-sm/6 text-gray-500">
+            Don't have an account?
+            <a
+              href="/signup"
+              class="font-semibold text-indigo-600 hover:text-indigo-500"
+              >Signup</a
+            >
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const inputElements = document.getElementsByTagName("input");
+      for (let i = 0; i < inputElements.length; i++) {
+        inputElements[i].addEventListener("click", function () {
+          document.querySelector(".verdict").innerText = "";
+        });
+      }
+
+      async function login() {
+        event.preventDefault();
+        const username = document
+          .querySelector('input[name="username"]')
+          .value.trim();
+        const password = document
+          .querySelector('input[name="password"]')
+          .value.trim();
+
+        const verdict = document.querySelector(".verdict");
+        console.log(username, password);
+
+        if (!username || !password) {
+          verdict.innerText = "All fields are required!";
+          return;
+        }
+
+        const payload = {
+          username,
+          password,
+        };
+
+        try {
+          // Send login request to the backend
+          const response = await fetch("/auth/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include", // To handle HTTP-only cookies
+            body: JSON.stringify(payload),
+          });
+
+          // Parse the response
+          const data = await response.json();
+
+          if (response.ok) {
+            // Redirect to dashboard on successful login
+            alert("Login successful! Redirecting to dashboard...");
+            window.location.href = "/home";
+          } else {
+            // Show error message if login fails
+            verdict.innerText =
+              data.message || "Invalid username or password. Please try again.";
+          }
+        } catch (error) {
+          verdict.innerText = "Something went wrong. Please try again.";
+          console.error("Error:", error);
+        }
+      }
+    </script>
+
+    <script src="{{ url_for('static', filename='index.global.js') }}"></script>
+  </body>
+</html>

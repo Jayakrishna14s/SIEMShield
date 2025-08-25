@@ -1,0 +1,156 @@
+services:
+  sourceapplication:
+    container_name: flask
+    hostname: flask
+    build: ./SourceApplication
+    environment:
+      - PYTHONPATH=/app
+    ports:
+      - "5000:5000"
+    volumes: 
+      - ./SourceApplication:/app
+    logging:
+      driver: splunk
+      options:
+        splunk-url: "https://localhost:8088" 
+        splunk-token: "87b40e94-7485-4259-91a5-846bcee2cdc8" 
+        splunk-insecureskipverify: "true"  
+        splunk-sourcetype: "flask"
+    depends_on:
+      splunk:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+
+  postgres:
+    container_name: postgres
+    hostname: postgres
+    image: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=Jayakrishna
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=SIEMSHIELD
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db:/var/lib/postgres
+    
+
+  splunk:
+    container_name: splunk
+    hostname: splunk
+    image: splunk/splunk:latest
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_PASSWORD=Krishna@2005
+      - SPLUNK_HEC_TOKEN=87b40e94-7485-4259-91a5-846bcee2cdc8 
+      - SPLUNK_HEC_RAW_ENABLED=true
+    ports:
+      - "8000:8000"
+      - "8088:8088"
+      - "8089:8089" 
+    healthcheck:
+      test: ["CMD", "curl", "-k", "https://localhost:8088/services/collector/health/1.0"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - splunk_etc:/opt/splunk/etc
+      - splunk_var:/opt/splunk/var
+    depends_on:
+      - kafka
+
+
+  kafka:
+    container_name: kafka
+    hostname: kafka
+    image: apache/kafka-native
+    ports:
+      - "9092:9092"
+    environment:
+      # Configure listeners for both docker and host communication
+      KAFKA_LISTENERS: CONTROLLER://localhost:9091,HOST://0.0.0.0:9092,DOCKER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9092,DOCKER://kafka:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,DOCKER:PLAINTEXT,HOST:PLAINTEXT
+
+      # Settings required for KRaft mode
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9091
+
+      # Listener to use for broker-to-broker communication
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
+
+      # Required for a single node cluster
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+   
+
+
+  kafka-ui:
+    container_name: kafka-ui 
+    hostname: kafka-ui
+    image: ghcr.io/kafbat/kafka-ui:latest
+    ports:
+      - 8080:8080
+    environment:
+      DYNAMIC_CONFIG_ENABLED: "true"
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9093
+    depends_on:
+      - kafka
+
+  webhook:
+    container_name: webhook
+    hostname: webhook
+    build: ./webhook
+    environment:
+      - PYTHONPATH=/app
+    ports:
+      - "5001:5000"
+    volumes: 
+      - ./webhook:/app
+    depends_on:
+      splunk:
+        condition: service_healthy
+      dashboard:
+        condition: service_started
+
+  llm:
+    container_name: llm 
+    hostname: llm 
+    build: ./llm 
+    environment:
+      - PYTHONPATH=/app
+    ports:
+      - "5002:5000"
+    volumes:
+      - ./llm:/app 
+    depends_on:
+      splunk:
+        condition: service_healthy
+      webhook:
+        condition: service_started 
+
+
+  dashboard:
+    container_name: dashboard
+    hostname: dashboard
+    build: ./dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./dashboard:/app
+ 
+volumes:
+  db:
+  splunk_etc:
+  splunk_var:
+  kafka-data:
+

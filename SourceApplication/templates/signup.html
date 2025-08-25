@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEMSHIELD</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='images/favicon.ico') }}"
+    />
+  </head>
+  <body class="bg-gray-100 flex flex-col h-screen">
+    <nav class="bg-white shadow-md p-4 px-6 shadow-lg flex justify-between">
+      <a
+        onclick="window.location.reload()"
+        class="text-2xl text-blue-500 tracking-wide font-bold cursor-pointer"
+        >SIEM<span class="text-gray-700">SHIELD</span>
+      </a>
+    </nav>
+
+    <main class="flex-1 overflow-scroll">
+      <div class="bg-grey-lighter h-full flex flex-col">
+        <div
+          class="container max-w-lg mx-auto flex-1 flex flex-col items-center justify-center px-2"
+        >
+          <form
+            class="bg-white px-12 py-8 rounded shadow-md text-black w-full rounded-lg shadow-lg flex items-center flex-col"
+          >
+            <h1 class="mb-8 text-3xl text-center font-semibold">Signup</h1>
+            <input
+              type="text"
+              class="block border border-grey-light border-1 w-full p-2 rounded mb-4"
+              name="fullname"
+              placeholder="Full Name"
+              required
+            />
+
+            <input
+              type="text"
+              class="block border border-grey-light border-1 w-full p-2 rounded mb-4"
+              name="username"
+              placeholder="Username"
+              required
+            />
+
+            <input
+              type="email"
+              class="block border border-grey-light border-1 w-full p-2 rounded mb-4"
+              name="email"
+              placeholder="Email"
+              required
+            />
+
+            <input
+              type="password"
+              class="block border border-grey-light border-1 w-full p-2 rounded mb-4"
+              name="password"
+              placeholder="Password"
+              required
+            />
+            <input
+              type="password"
+              class="block border border-grey-light border-1 w-full p-2 rounded mb-4"
+              name="confirm_password"
+              placeholder="Confirm Password"
+              required
+            />
+
+            <span class="verdict text-red-500 m-0"> </span>
+
+            <button
+              onclick="createAccount()"
+              class="shadow-lg mt-4 mb-1 p-2 rounded-lg hover:bg-gray-200 text-white font-semibold bg-black hover:text-black"
+            >
+              Create Account
+            </button>
+          </form>
+
+          <div class="text-grey-dark mt-6">
+            Already have an account?
+            <a
+              class="no-underline border-b border-blue text-blue-500"
+              href="/login"
+            >
+              Log in </a
+            >.
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const inputElements = document.getElementsByTagName("input");
+      for (let i = 0; i < inputElements.length; i++) {
+        inputElements[i].addEventListener("click", function () {
+          document.querySelector(".verdict").innerText = "";
+        });
+      }
+
+      async function createAccount() {
+        event.preventDefault();
+
+        const fullname = document
+          .querySelector('input[name="fullname"]')
+          .value.trim();
+        const username = document
+          .querySelector('input[name="username"]')
+          .value.trim();
+        const email = document
+          .querySelector('input[name="email"]')
+          .value.trim();
+        const password = document
+          .querySelector('input[name="password"]')
+          .value.trim();
+        const confirmPassword = document
+          .querySelector('input[name="confirm_password"]')
+          .value.trim();
+        const verdict = document.querySelector(".verdict");
+
+        console.log(fullname, username, email, password, confirmPassword);
+
+        if (password !== confirmPassword) {
+          verdict.innerText = "Passwords do not match!";
+          return;
+        }
+
+        const payload = {
+          fullname,
+          username,
+          email,
+          password,
+        };
+
+        try {
+          const response = await fetch("/auth/signup", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            alert("Account created successfully! Redirecting to login...");
+            window.location.href = "/login";
+          } else {
+            verdict.innerText =
+              data.message || "Error creating account. Please try again.";
+          }
+        } catch (error) {
+          verdict.innerText = "Something went wrong. Please try again.";
+          console.error("Error:", error);
+        }
+      }
+    </script>
+
+    <script src="{{ url_for('static', filename='index.global.js') }}"></script>
+  </body>
+</html>

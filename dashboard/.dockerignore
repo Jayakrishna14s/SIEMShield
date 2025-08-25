@@ -1,0 +1,6 @@
+.idea
+.dist
+__pycache__
+.dockerignore
+.git
+.gitignore

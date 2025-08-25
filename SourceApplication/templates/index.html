@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title> SIEMSHIELD </title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='images/favicon.ico') }}"
+    />
+  </head>
+  <body class="bg-gray-100 flex flex-col h-screen ">
+    <nav class="bg-white shadow-md p-4 px-6 shadow-lg flex justify-between">
+      <a
+        onclick="window.location.reload()"
+        class="text-2xl text-blue-500 tracking-wide font-bold cursor-pointer"
+        >SIEM<span class="text-gray-700">SHIELD</span>
+      </a>
+      <button onclick="window.location.href = '/login'">LOGIN</button>
+    </nav>
+
+    <main class="flex-1 overflow-scroll">
+      <!-- <img
+        src="{{ url_for('static', filename='images/siem.png') }}"
+        class="h-[70%] aspect-[1/1]"
+      /> -->
+      <div class="flex w-full h-[50%] bg-gray-200 flex">
+        <div class="p-8 h-full aspect-[1/1]">
+          <img
+            class="h-full aspect-[1/1]"
+            src="{{ url_for('static', filename='images/siem.png') }}"
+          />
+        </div>
+        <div class="p-8  bg-gradient-to-r from-[#fffffffBC] to-[#ffffff88] flex justify-center items-center">
+          <p class="px-6 flex-1 text-black font-semibold text-2xl">
+            SIEMShield leverages LLM-powered analysis to detect cyber threats in real time. It processes logs via Splunk and Kafka, enabling automated security actions like access restrictions and MFA enforcement. A live dashboard provides real-time monitoring for proactive cyber defense.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex justify-around p-8 mt-12">
+        <div class="flex flex-col items-center p-4 gap-2">
+          <img
+            src="{{ url_for('static', filename='images/splunk.svg') }}"
+            class="w-32"
+          />
+          <p class="text-lg font-semibold">Splunk</p>
+          <span>Log Analysis</p>
+        </div>
+        <div class="flex flex-col items-center p-4 gap-2">
+          <img
+            src="{{ url_for('static', filename='images/kafka.svg') }}"
+            class="w-32"
+          />
+          <p class="text-lg font-semibold">Kafka</p>
+          <span>Streaming</p>
+        </div>
+        <div class="flex flex-col items-center p-4 gap-2">
+          <img
+            src="{{ url_for('static', filename='images/LLM.png') }}"
+            class="w-32"
+          />
+          <p class="text-lg font-semibold">LLM</p>
+          <span>Large Language Model</p>
+        </div>
+      </div>
+
+  
+
+      <footer class="flex flex-col  flex-1  bg-gradient-to-r from-[#000040] to-[#00000077] p-20 pb-4">
+        <span class="text-amber-50 text-xl font-semibold my-2">SIEMSHIELD</span>
+        <hr class="w-full border-t border-white opacity-50">
+        <div class="flex justify-center gap-4 mt-12 mb-8">
+            <a href="https://www.github.com/Jayakrishna14s" target="_blank"><img src="{{ url_for('static', filename='images/github.svg') }}" class="w-[30px]"></a>
+            <a href="https://hub.docker.com/u/jayakrishna14" target="_blank"><img src="{{ url_for('static', filename='images/docker.svg') }}" class="w-[30px]"></a>
+            <a href="https://www.linkedin.com/in/jayakrishna-paripelli" target="_blank"><img src="{{ url_for('static', filename='images/linkedin.svg') }}" class="w-[30px]"></a>
+            <a href="https://www.instagram.com/jayakrishna__14" target="_blank"><img src="{{ url_for('static', filename='images/instagram.svg') }}" class="w-[30px]"></a>
+        </div>
+        <span class="text-center text-xs text-amber-50 ">© 2025
+            SIEMSHIELD  . All rights reserved.</span>
+
+    </footer>
+    </main>
+
+    <script src="{{ url_for('static', filename='index.global.js') }}"></script>
+
+  </body>
+</html>

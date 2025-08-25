@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flask App</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='images/favicon.ico') }}"
+    />
+  </head>
+
+  <body class="h-screen flex justify-center items-center">
+    <div class="flex flex-col items-center justify-center gap-15">
+      <img
+        class="w-70 aspect-[1/1]"
+        src="{{ url_for('static', filename='images/siem.png') }}"
+      />
+      <p class="font-bold text-2xl text-blue-700">
+        404 ERROR PAGE DOES NOT EXIST
+      </p>
+    </div>
+
+    <script src="{{ url_for('static', filename='index.global.js') }}"></script>
+  </body>
+</html>

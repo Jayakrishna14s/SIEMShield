@@ -1,0 +1,1 @@
+https://flask-jwt-extended.readthedocs.io/en/3.0.0_release/tokens_in_cookies/

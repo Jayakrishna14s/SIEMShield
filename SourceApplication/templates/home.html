@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIEMSHIELD</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='images/favicon.ico') }}"
+    />
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const container = document.getElementById("main");
+
+        fetch("/auth/protected")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            // const dataDisplay = document.createElement("p");
+            // dataDisplay.textContent = JSON.stringify(data);
+            container.textContent = "";
+            // container.appendChild(dataDisplay);
+
+            const profileCard = document.createElement("div");
+            profileCard.className =
+              " p-32 rounded-lg shadow-lg  text-center bg-white";
+
+            // Create and add profile image
+            const profileImage = document.createElement("img");
+            profileImage.src = data.image || "https://via.placeholder.com/120";
+            profileImage.alt = "Profile Picture";
+            profileImage.className =
+              "w-32 mx-auto rounded-full border-2 border-white object-cover ";
+            profileCard.appendChild(profileImage);
+
+            // Create and add username
+            const usernameElement = document.createElement("p");
+            usernameElement.textContent = `@${data.username}` || "@johndoe";
+            usernameElement.className = "text-sm text-gray-600 mb-2";
+            profileCard.appendChild(usernameElement);
+
+            // Create and add name
+            const nameElement = document.createElement("h2");
+            nameElement.textContent = data.name || "John Doe";
+            nameElement.className = "text-2xl font-semibold text-gray-800 mb-1";
+            profileCard.appendChild(nameElement);
+
+            // Create and add email
+            const emailElement = document.createElement("p");
+            emailElement.textContent = data.email || "johndoe@example.com";
+            emailElement.className = "text-sm text-gray-500 mb-4";
+            profileCard.appendChild(emailElement);
+
+            // Create and add logout button
+            const logoutBtn = document.createElement("button");
+            logoutBtn.textContent = "Logout";
+            logoutBtn.className =
+              "bg-red-500 hover:bg-red-600 text-white py-2 px-6 rounded-lg transition duration-300";
+            logoutBtn.onclick = () => {
+              fetch("/auth/logout", {
+                method: "POST",
+                credentials: "same-origin", // Ensures cookies are sent
+              })
+                .then((response) => {
+                  if (response.ok) {
+                    alert("Logged out successfully!");
+                    window.location.href = "/login"; // Redirect to login
+                  } else {
+                    alert("Error logging out. Please try again.");
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error during logout:", error);
+                  alert("An error occurred. Please try again.");
+                });
+            };
+            profileCard.appendChild(logoutBtn);
+
+            // Append profile card to the container
+            container.appendChild(profileCard);
+          })
+          .catch((error) => {
+            console.error("Fetch error:", error);
+
+            const internalContainer = document.createElement("div");
+            internalContainer.className =
+              "flex gap-2 flex-1 items-center justify-center flex-col h-screen";
+
+            const title = document.createElement("p");
+            title.className = "text-6xl font-bold";
+            title.textContent = "AN ERROR OCCURED";
+
+            const redirectMessage = document.createElement("p");
+            redirectMessage.className = "text-center";
+            redirectMessage.textContent = "Redirecting to login page";
+
+            internalContainer.appendChild(title);
+            internalContainer.appendChild(redirectMessage);
+
+            container.textContent = "";
+            container.appendChild(internalContainer);
+
+            setTimeout(function () {
+              window.location.href = "/login";
+            }, 5000);
+          });
+      });
+    </script>
+  </head>
+  <body>
+    <div
+      id="main"
+      class="flex h-screen items-center justify-center bg-gray-100"
+    >
+      <img
+        src="https://res.cloudinary.com/dkezdazmt/image/upload/v1737912774/Evernorth/loading.svg"
+        alt="Loading..."
+        class="h-24"
+      />
+    </div>
+
+    <script src="{{ url_for('static', filename='index.global.js') }}"></script>
+  </body>
+</html>
